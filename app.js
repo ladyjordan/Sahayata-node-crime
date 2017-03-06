@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
+var spotcrime = require('spotcrime');
+var json2csv = require('json2csv');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -50,6 +52,31 @@ var server = http.createServer(function(req, res) {
   res.end('The http server is all set');
 });
 server.listen(8080);
+
+//API client for crime stats for this lat,long
+var loc = {
+  lat: 37.3352,
+  lon: -121.8811
+};
+var radius = 0.1; // this is miles
+
+spotcrime.getCrimes(loc, radius, function(err, crimes){
+	
+	console.log(crimes)
+	console.log('_______________________')
+
+//JSON to CSV 
+var fields = ['cdid','date', 'type', 'address', 'lat','lon','link'];
+
+try {
+  var result = json2csv({ data: crimes, fields: fields });
+  console.log(result);
+} catch (err) {
+
+  console.error(err);
+}
+});
+
 
 
 module.exports = app;
